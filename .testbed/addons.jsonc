@@ -8,6 +8,12 @@
       "checkout": "main",
       "subfolder": "/"
     },
+    // The tool abstraction routes playback through the landed Godot audio backend.
+    "aerobeat-vendor-godot-audio": {
+      "url": "git@github.com:AeroBeat-Workouts/aerobeat-vendor-godot-audio.git",
+      "checkout": "main",
+      "subfolder": "/"
+    },
     // GUT drives the repo-local test suite inside the hidden testbed/workbench.
     "gut": {
       "url": "git@github.com:bitwes/Gut.git",
