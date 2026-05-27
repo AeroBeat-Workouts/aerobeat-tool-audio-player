@@ -29,88 +29,241 @@ theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="MarginContainer/VBox"]
 layout_mode = 2
-text = "AeroToolManager audio proving surface"
+text = "AeroToolManager multi-slot audio proving surface"
 
-[node name="PathLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="SummaryLabel" type="Label" parent="MarginContainer/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Slots: default"
+
+[node name="SlotsRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="DefaultPanel" type="PanelContainer" parent="MarginContainer/VBox/SlotsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBox/SlotsRow/DefaultPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
+layout_mode = 2
+text = "Default slot"
+
+[node name="DefaultPathLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "res://assets/audio/test-tone.ogg"
 
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="DefaultStatusLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "State: idle"
+text = "Default state: idle"
 
-[node name="DetailLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="DefaultDetailLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Position: 0.0 / 0.0 | Volume: 0.0 dB"
+text = "Loop: off | Position: 0.00 / 0.00 | Volume: 0.0 dB"
+autowrap_mode = 2
 
-[node name="ResultLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="DefaultResultLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Pick a file or load a sample."
+autowrap_mode = 2
 
-[node name="PlayerHost" type="Node" parent="MarginContainer/VBox"]
+[node name="DefaultPlayerHost" type="Node" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 
-[node name="SelectRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="DefaultSelectRow" type="HBoxContainer" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="ChooseFileButton" type="Button" parent="MarginContainer/VBox/SelectRow"]
+[node name="DefaultChooseFileButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow"]
 layout_mode = 2
 text = "Choose file…"
 
-[node name="UseSampleOggButton" type="Button" parent="MarginContainer/VBox/SelectRow"]
+[node name="DefaultUseSampleOggButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow"]
 layout_mode = 2
 text = "Use sample OGG"
 
-[node name="UseSampleWavButton" type="Button" parent="MarginContainer/VBox/SelectRow"]
+[node name="DefaultUseSampleWavButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow"]
 layout_mode = 2
 text = "Use sample WAV"
 
-[node name="ControlsRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+[node name="DefaultControlsRow" type="HBoxContainer" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="LoadButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultLoadButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Load"
 
-[node name="PlayButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultPlayButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Play"
 
-[node name="PauseButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultPauseButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Pause"
 
-[node name="ResumeButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultResumeButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Resume"
 
-[node name="StopButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultStopButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Stop"
 
-[node name="UnloadButton" type="Button" parent="MarginContainer/VBox/ControlsRow"]
+[node name="DefaultUnloadButton" type="Button" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow"]
 layout_mode = 2
 text = "Unload"
 
-[node name="SliderLabel" type="Label" parent="MarginContainer/VBox"]
+[node name="DefaultLoopCheck" type="CheckBox" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loop enabled"
+button_pressed = true
+
+[node name="DefaultSliderLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Seek 0.00s | Volume 0.0 dB"
 
-[node name="SeekSlider" type="HSlider" parent="MarginContainer/VBox"]
+[node name="DefaultSeekSlider" type="HSlider" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 max_value = 1.0
 step = 0.01
 
-[node name="VolumeSlider" type="HSlider" parent="MarginContainer/VBox"]
+[node name="DefaultVolumeSlider" type="HSlider" parent="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+min_value = -48.0
+max_value = 6.0
+step = 0.5
+value = 0.0
+
+[node name="SecondaryPanel" type="PanelContainer" parent="MarginContainer/VBox/SlotsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+layout_mode = 2
+text = "Secondary slot"
+
+[node name="SecondaryPathLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "res://assets/audio/test-tone.wav"
+
+[node name="SecondaryStatusLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Secondary state: idle"
+
+[node name="SecondaryDetailLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loop: off | Position: 0.00 / 0.00 | Volume: 0.0 dB"
+autowrap_mode = 2
+
+[node name="SecondaryResultLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Pick a file or load a sample."
+autowrap_mode = 2
+
+[node name="SecondaryPlayerHost" type="Node" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+
+[node name="SecondarySelectRow" type="HBoxContainer" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SecondaryChooseFileButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow"]
+layout_mode = 2
+text = "Choose file…"
+
+[node name="SecondaryUseSampleOggButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow"]
+layout_mode = 2
+text = "Use sample OGG"
+
+[node name="SecondaryUseSampleWavButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow"]
+layout_mode = 2
+text = "Use sample WAV"
+
+[node name="SecondaryControlsRow" type="HBoxContainer" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SecondaryLoadButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Load"
+
+[node name="SecondaryPlayButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Play"
+
+[node name="SecondaryPauseButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Pause"
+
+[node name="SecondaryResumeButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Resume"
+
+[node name="SecondaryStopButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Stop"
+
+[node name="SecondaryUnloadButton" type="Button" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow"]
+layout_mode = 2
+text = "Unload"
+
+[node name="SecondaryLoopCheck" type="CheckBox" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loop enabled"
+
+[node name="SecondarySliderLabel" type="Label" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Seek 0.00s | Volume 0.0 dB"
+
+[node name="SecondarySeekSlider" type="HSlider" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="SecondaryVolumeSlider" type="HSlider" parent="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
@@ -126,16 +279,30 @@ file_mode = 0
 access = 2
 use_native_dialog = true
 
-[connection signal="pressed" from="MarginContainer/VBox/SelectRow/ChooseFileButton" to="." method="_on_choose_file_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/SelectRow/UseSampleOggButton" to="." method="_on_use_sample_ogg_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/SelectRow/UseSampleWavButton" to="." method="_on_use_sample_wav_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/LoadButton" to="." method="_on_load_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/PlayButton" to="." method="_on_play_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/PauseButton" to="." method="_on_pause_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/ResumeButton" to="." method="_on_resume_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/StopButton" to="." method="_on_stop_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBox/ControlsRow/UnloadButton" to="." method="_on_unload_button_pressed"]
-[connection signal="drag_started" from="MarginContainer/VBox/SeekSlider" to="." method="_on_seek_slider_drag_started"]
-[connection signal="drag_ended" from="MarginContainer/VBox/SeekSlider" to="." method="_on_seek_slider_drag_ended"]
-[connection signal="value_changed" from="MarginContainer/VBox/VolumeSlider" to="." method="_on_volume_slider_value_changed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow/DefaultChooseFileButton" to="." method="_on_default_choose_file_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow/DefaultUseSampleOggButton" to="." method="_on_default_use_sample_ogg_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSelectRow/DefaultUseSampleWavButton" to="." method="_on_default_use_sample_wav_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultLoadButton" to="." method="_on_default_load_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultPlayButton" to="." method="_on_default_play_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultPauseButton" to="." method="_on_default_pause_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultResumeButton" to="." method="_on_default_resume_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultStopButton" to="." method="_on_default_stop_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultControlsRow/DefaultUnloadButton" to="." method="_on_default_unload_button_pressed"]
+[connection signal="drag_started" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSeekSlider" to="." method="_on_default_seek_slider_drag_started"]
+[connection signal="drag_ended" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultSeekSlider" to="." method="_on_default_seek_slider_drag_ended"]
+[connection signal="value_changed" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultVolumeSlider" to="." method="_on_default_volume_slider_value_changed"]
+[connection signal="toggled" from="MarginContainer/VBox/SlotsRow/DefaultPanel/Margin/VBox/DefaultLoopCheck" to="." method="_on_default_loop_check_toggled"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow/SecondaryChooseFileButton" to="." method="_on_secondary_choose_file_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow/SecondaryUseSampleOggButton" to="." method="_on_secondary_use_sample_ogg_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySelectRow/SecondaryUseSampleWavButton" to="." method="_on_secondary_use_sample_wav_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryLoadButton" to="." method="_on_secondary_load_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryPlayButton" to="." method="_on_secondary_play_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryPauseButton" to="." method="_on_secondary_pause_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryResumeButton" to="." method="_on_secondary_resume_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryStopButton" to="." method="_on_secondary_stop_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryControlsRow/SecondaryUnloadButton" to="." method="_on_secondary_unload_button_pressed"]
+[connection signal="drag_started" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySeekSlider" to="." method="_on_secondary_seek_slider_drag_started"]
+[connection signal="drag_ended" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondarySeekSlider" to="." method="_on_secondary_seek_slider_drag_ended"]
+[connection signal="value_changed" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryVolumeSlider" to="." method="_on_secondary_volume_slider_value_changed"]
+[connection signal="toggled" from="MarginContainer/VBox/SlotsRow/SecondaryPanel/Margin/VBox/SecondaryLoopCheck" to="." method="_on_secondary_loop_check_toggled"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

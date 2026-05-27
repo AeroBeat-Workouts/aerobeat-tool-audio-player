@@ -20,6 +20,8 @@ func test_readme_keeps_v1_tool_template_truth() -> void:
 	assert_true(readme_text.contains("camera only"), "README should preserve camera-only official gameplay input wording")
 	assert_true(readme_text.contains("gameplay-mode agnostic"), "README should preserve the tool-lane scope boundary")
 	assert_true(readme_text.contains("aerobeat-tool-core"), "README should point at the tool-core baseline")
+	assert_true(readme_text.contains("two independent tool-managed slots"), "README should document the multi-slot proving surface")
+	assert_true(readme_text.contains("toggle loop mode"), "README should document loop coverage through the tool abstraction")
 
 func test_plugin_cfg_description_stays_template_specific() -> void:
 	var config := ConfigFile.new()

@@ -51,6 +51,8 @@ godot --editor --path .testbed
 
 Use this `.testbed/` project as the canonical direct-development and bugfinding surface for tool-template work.
 
+The hidden proving surface in this repo now exercises the audio abstraction through two independent tool-managed slots. Each slot can load packaged or external `.ogg`/`.wav` assets, toggle loop mode, and drive playback/seek/volume controls without bleeding state into the other slot.
+
 ### Import smoke check
 
 From the repo root:
@@ -76,5 +78,6 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
 - The canonical template manifest for this repo is `aerobeat-tool-core` + `gut`.
 - `aerobeat-tool-core` is currently pinned to `main` intentionally because the repo does not yet have release tags; switch to a tag once tagged releases exist.
 - If a concrete tool needs adjacent lane repos, add them intentionally rather than restoring a universal `aerobeat-core` baseline.
-- Repo-local unit tests live under `.testbed/tests/` and currently validate repo metadata plus the template stub contract.
+- Repo-local unit tests live under `.testbed/tests/` and validate repo metadata plus the real tool-facing audio abstraction contract.
+- The current testbed/tests cover loop enable/disable, independent multi-slot playback control, and both packaged plus external local audio paths through `AeroToolManager` rather than the backend directly.
 - The current package shape is consumed from the repo root (`subfolder: "/"`) for downstream installs.
