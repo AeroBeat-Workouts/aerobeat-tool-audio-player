@@ -1,13 +1,13 @@
 extends GutTest
 
 const FACTORY_SCRIPT := preload("res://addons/aerobeat-vendor-godot-audio/src/AeroGodotAudioBackendFactory.gd")
-const TOOL_MANAGER_SCRIPT := preload("res://addons/aerobeat-tool-audio-player/src/AeroToolManager.gd")
+const AUDIO_LOADER_SCRIPT := preload("res://addons/aerobeat-tool-audio-player/src/AeroAudioLoader.gd")
 const FAKE_PLAYER_SCRIPT := preload("res://tests/helpers/FakeAudioStreamPlayer.gd")
 const SAMPLE_OGG_PATH := "res://assets/audio/test-tone.ogg"
 const SAMPLE_WAV_PATH := "res://assets/audio/test-tone.wav"
 
 var _factory: AeroGodotAudioBackendFactory
-var _manager: AeroToolManager
+var _manager: AeroAudioLoader
 var _external_tmp_dir: String = ""
 var _external_ogg_path: String = ""
 var _external_wav_path: String = ""
@@ -17,7 +17,7 @@ func _make_fake_player() -> Node:
 
 func before_each() -> void:
 	_factory = FACTORY_SCRIPT.new()
-	_manager = TOOL_MANAGER_SCRIPT.new()
+	_manager = AUDIO_LOADER_SCRIPT.new()
 	_manager.set_backend(_factory.create_backend(Callable(self, "_make_fake_player")))
 	add_child_autofree(_manager)
 	_manager._initialize()
@@ -53,12 +53,13 @@ func _make_surface(name: String) -> Node:
 	add_child_autofree(surface)
 	return surface
 
-func test_public_surface_keeps_aerotoolmanager_and_vendor_abstraction_entrypoint() -> void:
+func test_public_surface_exports_the_renamed_aeroaudioloader_entrypoint() -> void:
 	var class_names := _global_class_names()
-	assert_true(class_names.has("AeroToolManager"), "Repo should still export AeroToolManager as the stable singleton entrypoint")
-	assert_eq(AeroToolManager.VERSION, "0.2.0", "Audio tool manager version should reflect the loop plus multi-audio abstraction slice")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_IDLE, "Fresh tool manager should begin idle")
-	assert_true(_manager.list_audio_ids().has(AeroToolManager.DEFAULT_AUDIO_ID), "Default audio slot should be created eagerly for backwards compatibility")
+	assert_true(class_names.has("AeroAudioLoader"), "Repo should export AeroAudioLoader as the singleton entrypoint")
+	assert_false(class_names.has("AeroToolManager"), "Repo should no longer export the old AeroToolManager global class after the rename")
+	assert_eq(AeroAudioLoader.VERSION, "0.2.0", "Audio loader version should reflect the loop plus multi-audio abstraction slice")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_IDLE, "Fresh audio loader should begin idle")
+	assert_true(_manager.list_audio_ids().has(AeroAudioLoader.DEFAULT_AUDIO_ID), "Default audio slot should be created eagerly for backwards compatibility")
 
 func test_tool_manager_proxies_load_unload_play_pause_resume_stop_volume_seek_and_loop_on_default_slot() -> void:
 	var surface := _make_surface("ManagedSurface")
@@ -80,18 +81,18 @@ func test_tool_manager_proxies_load_unload_play_pause_resume_stop_volume_seek_an
 		callback_state["load_success"] = str(result.get("media_info", {}).get("path", "")) == SAMPLE_WAV_PATH
 	)
 	assert_true(bool(callback_state.get("load_success", false)), "Load should resolve through the promise-like success callback")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "Manager should become ready after load")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_READY, "Manager should become ready after load")
 	assert_true(_manager.is_loop_enabled(), "Default slot should preserve the requested loop flag")
 	assert_almost_eq(_manager.get_position(), 0.2, 0.001, "Manager should honor start_time")
 
 	_manager.play().on_success(func(_result: Dictionary) -> void:
 		pass
 	)
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "play should transition into playing")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PLAYING, "play should transition into playing")
 	_manager.pause()
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PAUSED, "pause should transition into paused")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PAUSED, "pause should transition into paused")
 	_manager.resume()
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "resume should transition back into playing")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PLAYING, "resume should transition back into playing")
 	_manager.seek(0.7)
 	assert_almost_eq(_manager.get_position(), 0.7, 0.001, "seek should update the manager position")
 	_manager.set_volume_db(-12.0)
@@ -99,15 +100,15 @@ func test_tool_manager_proxies_load_unload_play_pause_resume_stop_volume_seek_an
 	var loop_result := _manager.set_loop_enabled(false)
 	assert_true(loop_result.did_succeed(), "set_loop_enabled should reconfigure the currently loaded slot")
 	assert_false(_manager.is_loop_enabled(), "Loop helper should disable loop without unloading the slot")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Loop reconfiguration should preserve a playing slot")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PLAYING, "Loop reconfiguration should preserve a playing slot")
 	assert_almost_eq(_manager.get_position(), 0.7, 0.001, "Loop reconfiguration should preserve playback position")
 	_manager.stop()
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "stop should return the manager to ready")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_READY, "stop should return the manager to ready")
 	assert_almost_eq(_manager.get_position(), 0.0, 0.001, "stop should reset playback position")
 	_manager.unload()
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_IDLE, "unload should return the manager to idle")
-	assert_true(state_events.has(AeroToolManager.STATE_PLAYING), "State listener should receive playing transitions")
-	assert_true(state_events.has(AeroToolManager.STATE_PAUSED), "State listener should receive paused transitions")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_IDLE, "unload should return the manager to idle")
+	assert_true(state_events.has(AeroAudioLoader.STATE_PLAYING), "State listener should receive playing transitions")
+	assert_true(state_events.has(AeroAudioLoader.STATE_PAUSED), "State listener should receive paused transitions")
 
 func test_tool_manager_loads_and_plays_even_when_testbed_metadata_mentions_the_audio_id_slot() -> void:
 	var default_surface := _make_surface("DefaultSurface")
@@ -119,7 +120,7 @@ func test_tool_manager_loads_and_plays_even_when_testbed_metadata_mentions_the_a
 
 	var default_result := _manager.load({
 		"path": SAMPLE_OGG_PATH,
-		"metadata": {"source": "audio_tool_testbed", "slot": AeroToolManager.DEFAULT_AUDIO_ID},
+		"metadata": {"source": "audio_tool_testbed", "slot": AeroAudioLoader.DEFAULT_AUDIO_ID},
 	})
 	var secondary_result := _manager.load({
 		"path": SAMPLE_WAV_PATH,
@@ -132,30 +133,35 @@ func test_tool_manager_loads_and_plays_even_when_testbed_metadata_mentions_the_a
 	var secondary_play_result := _manager.play("secondary")
 	assert_true(default_play_result.did_succeed(), "Default audio should remain playable after load")
 	assert_true(secondary_play_result.did_succeed(), "Secondary audio should remain playable after load")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Default audio should be playing after play")
-	assert_eq(str(_manager.get_state("secondary").get("state", "")), AeroToolManager.STATE_PLAYING, "Secondary audio should be playing after play")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PLAYING, "Default audio should be playing after play")
+	assert_eq(str(_manager.get_state("secondary").get("state", "")), AeroAudioLoader.STATE_PLAYING, "Secondary audio should be playing after play")
 
-func test_tool_manager_remains_playable_when_loop_is_enabled_after_testbed_style_load() -> void:
+func test_tool_manager_remains_playable_when_wav_loop_is_enabled_after_testbed_style_load() -> void:
 	var surface := _make_surface("LoopToggleSurface")
 	_manager.attach_surface(surface)
 
 	var load_result := _manager.load({
-		"path": SAMPLE_OGG_PATH,
+		"path": SAMPLE_WAV_PATH,
 		"loop": false,
-		"metadata": {"source": "audio_tool_testbed", "slot": AeroToolManager.DEFAULT_AUDIO_ID},
+		"metadata": {"source": "audio_tool_testbed", "slot": AeroAudioLoader.DEFAULT_AUDIO_ID},
 	})
-	assert_true(load_result.did_succeed(), "Default audio should load with loop disabled before the UI toggle")
+	assert_true(load_result.did_succeed(), "Default WAV audio should load with loop disabled before the UI toggle")
 	assert_false(_manager.is_loop_enabled(), "Load should begin with loop disabled for the regression setup")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "Freshly loaded audio should stay ready before play")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_READY, "Freshly loaded audio should stay ready before play")
 
 	var toggle_result := _manager.set_loop_enabled(true)
 	assert_true(toggle_result.did_succeed(), "Enabling loop after load should succeed without reloading the source")
 	assert_true(_manager.is_loop_enabled(), "Loop should be enabled after the UI-style toggle")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "Loop toggle should preserve the ready state before play")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_READY, "Loop toggle should preserve the ready state before play")
+
+	var backend := _manager.get_backend() as AeroGodotAudioBackend
+	var wav_stream := backend._stream_resource as AudioStreamWAV if backend != null else null
+	assert_true(wav_stream != null, "WAV regression path should be backed by a real AudioStreamWAV resource")
+	assert_gt(int(wav_stream.loop_end), int(wav_stream.loop_begin), "Loop-enabled WAV playback should expand the stream loop window beyond its imported zero-length endpoint")
 
 	var play_result := _manager.play()
 	assert_true(play_result.did_succeed(), "Audio should still play after enabling loop in the testbed flow")
-	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Default audio should enter playing after the loop-enabled play")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroAudioLoader.STATE_PLAYING, "Default audio should enter playing after the loop-enabled play")
 
 func test_tool_manager_supports_packaged_and_external_audio_paths() -> void:
 	var surface := _make_surface("ExternalSurface")
@@ -199,8 +205,8 @@ func test_tool_manager_supports_independent_multi_audio_slots() -> void:
 	_manager.pause("sfx")
 	_manager.seek(0.25, "music")
 
-	assert_eq(str(_manager.get_state("music").get("state", "")), AeroToolManager.STATE_PLAYING, "Music slot should keep playing")
-	assert_eq(str(_manager.get_state("sfx").get("state", "")), AeroToolManager.STATE_PAUSED, "SFX slot should pause without affecting music")
+	assert_eq(str(_manager.get_state("music").get("state", "")), AeroAudioLoader.STATE_PLAYING, "Music slot should keep playing")
+	assert_eq(str(_manager.get_state("sfx").get("state", "")), AeroAudioLoader.STATE_PAUSED, "SFX slot should pause without affecting music")
 	assert_true(_manager.is_loop_enabled("music"), "Music slot should keep loop enabled")
 	assert_false(_manager.is_loop_enabled("sfx"), "SFX slot should keep loop disabled")
 	assert_almost_eq(_manager.get_position("music"), 0.25, 0.001, "Music slot seek should stay isolated")
@@ -219,8 +225,8 @@ func test_failure_callbacks_and_state_listener_helpers_surface_honest_errors() -
 	_manager.load({"path": "https://example.com/demo.ogg"}).on_failure(func(error_info: Dictionary) -> void:
 		callback_state["failure_code"] = str(error_info.get("code", ""))
 	)
-	assert_eq(str(callback_state.get("failure_code", "")), AeroToolManager.ERROR_INVALID_SOURCE, "Remote URLs should reject through the promise-like failure callback")
-	assert_eq(str(_manager.get_last_error().get("code", "")), AeroToolManager.ERROR_INVALID_SOURCE, "Manager should retain the invalid-source error")
+	assert_eq(str(callback_state.get("failure_code", "")), AeroAudioLoader.ERROR_INVALID_SOURCE, "Remote URLs should reject through the promise-like failure callback")
+	assert_eq(str(_manager.get_last_error().get("code", "")), AeroAudioLoader.ERROR_INVALID_SOURCE, "Manager should retain the invalid-source error")
 	assert_true(int(callback_state.get("listener_calls", 0)) >= 1, "listen_for_state should optionally emit the current state immediately")
 	_manager.stop_listening_for_state(listener)
 	assert_false(_manager.state_changed.is_connected(listener), "stop_listening_for_state should disconnect the callback")

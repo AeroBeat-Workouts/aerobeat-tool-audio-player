@@ -2,7 +2,7 @@ extends Control
 
 const SAMPLE_OGG_PATH := "res://assets/audio/test-tone.ogg"
 const SAMPLE_WAV_PATH := "res://assets/audio/test-tone.wav"
-const SLOT_IDS := [AeroToolManager.DEFAULT_AUDIO_ID, "secondary"]
+const SLOT_IDS := [AeroAudioLoader.DEFAULT_AUDIO_ID, "secondary"]
 
 @onready var summary_label: Label = %SummaryLabel
 @onready var picker: FileDialog = %FileDialog
@@ -27,15 +27,15 @@ const SLOT_IDS := [AeroToolManager.DEFAULT_AUDIO_ID, "secondary"]
 @onready var secondary_volume_slider: HSlider = %SecondaryVolumeSlider
 @onready var secondary_loop_check: CheckBox = %SecondaryLoopCheck
 
-var _manager: AeroToolManager
+var _manager: AeroAudioLoader
 var _slot_ui: Dictionary = {}
 var _selected_paths: Dictionary = {}
 var _suspend_seek_updates: Dictionary = {}
-var _active_dialog_slot: String = AeroToolManager.DEFAULT_AUDIO_ID
+var _active_dialog_slot: String = AeroAudioLoader.DEFAULT_AUDIO_ID
 
 func _ready() -> void:
 	_slot_ui = {
-		AeroToolManager.DEFAULT_AUDIO_ID: {
+		AeroAudioLoader.DEFAULT_AUDIO_ID: {
 			"path_label": default_path_label,
 			"status_label": default_status_label,
 			"detail_label": default_detail_label,
@@ -59,15 +59,15 @@ func _ready() -> void:
 		},
 	}
 	_selected_paths = {
-		AeroToolManager.DEFAULT_AUDIO_ID: SAMPLE_OGG_PATH,
+		AeroAudioLoader.DEFAULT_AUDIO_ID: SAMPLE_OGG_PATH,
 		"secondary": SAMPLE_WAV_PATH,
 	}
 	_suspend_seek_updates = {
-		AeroToolManager.DEFAULT_AUDIO_ID: false,
+		AeroAudioLoader.DEFAULT_AUDIO_ID: false,
 		"secondary": false,
 	}
 
-	_manager = AeroToolManager.new()
+	_manager = AeroAudioLoader.new()
 	add_child(_manager)
 	_manager.audio_state_changed.connect(_on_audio_state_changed)
 	_manager.audio_media_loaded.connect(_on_audio_media_loaded)
@@ -80,7 +80,7 @@ func _ready() -> void:
 		var ui: Dictionary = _ui(slot_id)
 		ui["path_label"].text = str(_selected_paths.get(slot_id, ""))
 		ui["volume_slider"].value = 0.0
-		ui["loop_check"].button_pressed = slot_id == AeroToolManager.DEFAULT_AUDIO_ID
+		ui["loop_check"].button_pressed = slot_id == AeroAudioLoader.DEFAULT_AUDIO_ID
 		_manager.attach_surface(ui["player_host"], slot_id)
 	set_process(true)
 	_refresh_all()
@@ -122,7 +122,7 @@ func _refresh_slot(slot_id: String) -> void:
 	ui["path_label"].text = str(_selected_paths.get(slot_id, ""))
 
 func _display_slot_name(slot_id: String) -> String:
-	return "Default" if slot_id == AeroToolManager.DEFAULT_AUDIO_ID else "Secondary"
+	return "Default" if slot_id == AeroAudioLoader.DEFAULT_AUDIO_ID else "Secondary"
 
 func _choose_path(slot_id: String, path: String) -> void:
 	_selected_paths[slot_id] = path
@@ -211,48 +211,48 @@ func _on_file_dialog_file_selected(path: String) -> void:
 	_choose_path(_active_dialog_slot, path)
 
 func _on_default_choose_file_button_pressed() -> void:
-	_active_dialog_slot = AeroToolManager.DEFAULT_AUDIO_ID
+	_active_dialog_slot = AeroAudioLoader.DEFAULT_AUDIO_ID
 	picker.popup_centered_ratio(0.8)
 
 func _on_default_use_sample_ogg_button_pressed() -> void:
-	_choose_path(AeroToolManager.DEFAULT_AUDIO_ID, SAMPLE_OGG_PATH)
+	_choose_path(AeroAudioLoader.DEFAULT_AUDIO_ID, SAMPLE_OGG_PATH)
 
 func _on_default_use_sample_wav_button_pressed() -> void:
-	_choose_path(AeroToolManager.DEFAULT_AUDIO_ID, SAMPLE_WAV_PATH)
+	_choose_path(AeroAudioLoader.DEFAULT_AUDIO_ID, SAMPLE_WAV_PATH)
 
 func _on_default_load_button_pressed() -> void:
-	_load_selected_path(AeroToolManager.DEFAULT_AUDIO_ID)
+	_load_selected_path(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_play_button_pressed() -> void:
-	_play_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_play_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_pause_button_pressed() -> void:
-	_pause_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_pause_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_resume_button_pressed() -> void:
-	_resume_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_resume_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_stop_button_pressed() -> void:
-	_stop_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_stop_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_unload_button_pressed() -> void:
-	_unload_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_unload_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_seek_slider_drag_started() -> void:
-	_suspend_seek_updates[AeroToolManager.DEFAULT_AUDIO_ID] = true
+	_suspend_seek_updates[AeroAudioLoader.DEFAULT_AUDIO_ID] = true
 
 func _on_default_seek_slider_drag_ended(_value_changed: bool) -> void:
-	_suspend_seek_updates[AeroToolManager.DEFAULT_AUDIO_ID] = false
-	_manager.seek(default_seek_slider.value, AeroToolManager.DEFAULT_AUDIO_ID).on_failure(func(error_info: Dictionary) -> void:
+	_suspend_seek_updates[AeroAudioLoader.DEFAULT_AUDIO_ID] = false
+	_manager.seek(default_seek_slider.value, AeroAudioLoader.DEFAULT_AUDIO_ID).on_failure(func(error_info: Dictionary) -> void:
 		default_result_label.text = "Default seek failed: %s" % str(error_info.get("message", "Unknown error"))
 	)
 
 func _on_default_volume_slider_value_changed(value: float) -> void:
-	_manager.set_volume_db(value, AeroToolManager.DEFAULT_AUDIO_ID)
-	_refresh_slot(AeroToolManager.DEFAULT_AUDIO_ID)
+	_manager.set_volume_db(value, AeroAudioLoader.DEFAULT_AUDIO_ID)
+	_refresh_slot(AeroAudioLoader.DEFAULT_AUDIO_ID)
 
 func _on_default_loop_check_toggled(toggled_on: bool) -> void:
-	_set_loop(AeroToolManager.DEFAULT_AUDIO_ID, toggled_on)
+	_set_loop(AeroAudioLoader.DEFAULT_AUDIO_ID, toggled_on)
 
 func _on_secondary_choose_file_button_pressed() -> void:
 	_active_dialog_slot = "secondary"

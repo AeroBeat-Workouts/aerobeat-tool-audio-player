@@ -2,7 +2,7 @@
 ##
 ## This class keeps the stable tool-facing global name while delegating all
 ## concrete playback work to the currently wired vendor backend manager.
-class_name AeroToolManager
+class_name AeroAudioLoader
 extends Node
 
 const VendorFactoryScript := preload("res://addons/aerobeat-vendor-godot-audio/src/AeroGodotAudioBackendFactory.gd")

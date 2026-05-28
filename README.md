@@ -79,5 +79,5 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
 - `aerobeat-tool-core` is currently pinned to `main` intentionally because the repo does not yet have release tags; switch to a tag once tagged releases exist.
 - If a concrete tool needs adjacent lane repos, add them intentionally rather than restoring a universal `aerobeat-core` baseline.
 - Repo-local unit tests live under `.testbed/tests/` and validate repo metadata plus the real tool-facing audio abstraction contract.
-- The current testbed/tests cover loop enable/disable, independent multi-slot playback control, and both packaged plus external local audio paths through `AeroToolManager` rather than the backend directly.
+- The current testbed/tests cover loop enable/disable, independent multi-slot playback control, and both packaged plus external local audio paths through `AeroAudioLoader` rather than the backend directly.
 - The current package shape is consumed from the repo root (`subfolder: "/"`) for downstream installs.
