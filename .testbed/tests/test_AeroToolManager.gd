@@ -1,7 +1,7 @@
 extends GutTest
 
 const FACTORY_SCRIPT := preload("res://addons/aerobeat-vendor-godot-audio/src/AeroGodotAudioBackendFactory.gd")
-const TOOL_MANAGER_SCRIPT := preload("res://src/AeroToolManager.gd")
+const TOOL_MANAGER_SCRIPT := preload("res://addons/aerobeat-tool-audio-player/src/AeroToolManager.gd")
 const FAKE_PLAYER_SCRIPT := preload("res://tests/helpers/FakeAudioStreamPlayer.gd")
 const SAMPLE_OGG_PATH := "res://assets/audio/test-tone.ogg"
 const SAMPLE_WAV_PATH := "res://assets/audio/test-tone.wav"
