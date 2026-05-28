@@ -109,6 +109,32 @@ func test_tool_manager_proxies_load_unload_play_pause_resume_stop_volume_seek_an
 	assert_true(state_events.has(AeroToolManager.STATE_PLAYING), "State listener should receive playing transitions")
 	assert_true(state_events.has(AeroToolManager.STATE_PAUSED), "State listener should receive paused transitions")
 
+func test_tool_manager_loads_and_plays_even_when_testbed_metadata_mentions_the_audio_id_slot() -> void:
+	var default_surface := _make_surface("DefaultSurface")
+	var secondary_surface := _make_surface("SecondarySurface")
+	_manager.attach_surface(default_surface)
+	_manager.attach_surface(secondary_surface, "secondary")
+	_manager.set_backend(_factory.create_backend(Callable(self, "_make_fake_player")), "secondary")
+	_manager.attach_surface(secondary_surface, "secondary")
+
+	var default_result := _manager.load({
+		"path": SAMPLE_OGG_PATH,
+		"metadata": {"source": "audio_tool_testbed", "slot": AeroToolManager.DEFAULT_AUDIO_ID},
+	})
+	var secondary_result := _manager.load({
+		"path": SAMPLE_WAV_PATH,
+		"metadata": {"source": "audio_tool_testbed", "slot": "secondary"},
+	}, "secondary")
+	assert_true(default_result.did_succeed(), "Default audio should load even when metadata carries the tool-facing slot id")
+	assert_true(secondary_result.did_succeed(), "Secondary audio should load even when metadata carries the tool-facing slot id")
+
+	var default_play_result := _manager.play()
+	var secondary_play_result := _manager.play("secondary")
+	assert_true(default_play_result.did_succeed(), "Default audio should remain playable after load")
+	assert_true(secondary_play_result.did_succeed(), "Secondary audio should remain playable after load")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Default audio should be playing after play")
+	assert_eq(str(_manager.get_state("secondary").get("state", "")), AeroToolManager.STATE_PLAYING, "Secondary audio should be playing after play")
+
 func test_tool_manager_supports_packaged_and_external_audio_paths() -> void:
 	var surface := _make_surface("ExternalSurface")
 	_manager.attach_surface(surface)

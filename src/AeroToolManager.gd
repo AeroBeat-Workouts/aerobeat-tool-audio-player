@@ -120,32 +120,41 @@ func can_load_source(source: Dictionary, audio_id: String = DEFAULT_AUDIO_ID) ->
 	return _manager(audio_id).can_load_source(_normalize_source_for_audio(source, audio_id))
 
 func load(source: Dictionary, audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).load(_normalize_source_for_audio(source, audio_id))
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).load(_normalize_source_for_audio(source, resolved_audio_id), _runtime_slot_name(resolved_audio_id))
 
 func unload(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).unload()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).unload(_runtime_slot_name(resolved_audio_id))
 
 func play(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).play()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).play(_runtime_slot_name(resolved_audio_id))
 
 func pause(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).pause()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).pause(_runtime_slot_name(resolved_audio_id))
 
 func resume(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).resume()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).resume(_runtime_slot_name(resolved_audio_id))
 
 func stop(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).stop()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).stop(_runtime_slot_name(resolved_audio_id))
 
 func seek(seconds: float, audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).seek(seconds)
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).seek(seconds, _runtime_slot_name(resolved_audio_id))
 
 func set_volume_db(volume_db: float, audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).set_volume_db(volume_db)
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).set_volume_db(volume_db, _runtime_slot_name(resolved_audio_id))
 
 func set_loop_enabled(enabled: bool, audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
 	var resolved_audio_id := _resolve_audio_id(audio_id)
 	var manager := _manager(resolved_audio_id)
+	var runtime_slot := _runtime_slot_name(resolved_audio_id)
 	var operation: AeroAudioOperation = AeroAudioOperationScript.new()
 	var state := get_state(resolved_audio_id)
 	var source: Dictionary = state.get("source", {}).duplicate(true)
@@ -160,20 +169,20 @@ func set_loop_enabled(enabled: bool, audio_id: String = DEFAULT_AUDIO_ID) -> Aer
 	var previous_position := float(state.get("position", 0.0))
 	source["loop"] = enabled
 	source["autoplay"] = false
-	var load_operation := manager.load(_normalize_source_for_audio(source, resolved_audio_id))
+	var load_operation := manager.load(_normalize_source_for_audio(source, resolved_audio_id), runtime_slot)
 	if not load_operation.did_succeed():
 		return load_operation
 	if previous_position > 0.0:
-		var seek_operation := manager.seek(previous_position)
+		var seek_operation := manager.seek(previous_position, runtime_slot)
 		if not seek_operation.did_succeed():
 			return seek_operation
 	match previous_state:
 		STATE_PLAYING:
-			var play_operation := manager.play()
+			var play_operation := manager.play(runtime_slot)
 			if not play_operation.did_succeed():
 				return play_operation
 		STATE_PAUSED:
-			var pause_operation := manager.pause()
+			var pause_operation := manager.pause(runtime_slot)
 			if not pause_operation.did_succeed():
 				return pause_operation
 	return operation.settle_success({
@@ -187,7 +196,7 @@ func is_loop_enabled(audio_id: String = DEFAULT_AUDIO_ID) -> bool:
 
 func get_state(audio_id: String = DEFAULT_AUDIO_ID) -> Dictionary:
 	var resolved_audio_id := _resolve_audio_id(audio_id)
-	var state := _manager(resolved_audio_id).get_state().duplicate(true)
+	var state := _manager(resolved_audio_id).get_state(_runtime_slot_name(resolved_audio_id)).duplicate(true)
 	state["audio_id"] = resolved_audio_id
 	state["loop"] = bool(state.get("source", {}).get("loop", false))
 	return state
@@ -199,27 +208,32 @@ func get_all_states() -> Dictionary:
 	return states
 
 func get_duration(audio_id: String = DEFAULT_AUDIO_ID) -> float:
-	return _manager(audio_id).get_duration()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).get_duration(_runtime_slot_name(resolved_audio_id))
 
 func get_position(audio_id: String = DEFAULT_AUDIO_ID) -> float:
-	return _manager(audio_id).get_position()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).get_position(_runtime_slot_name(resolved_audio_id))
 
 func get_media_info(audio_id: String = DEFAULT_AUDIO_ID) -> Dictionary:
 	var resolved_audio_id := _resolve_audio_id(audio_id)
-	var media_info := _manager(resolved_audio_id).get_media_info().duplicate(true)
+	var media_info := _manager(resolved_audio_id).get_media_info(_runtime_slot_name(resolved_audio_id)).duplicate(true)
 	media_info["audio_id"] = resolved_audio_id
 	media_info["loop"] = bool(get_state(resolved_audio_id).get("loop", false))
 	return media_info
 
 func attach_surface(node: Node, audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).attach_surface(node)
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).attach_surface(node, _runtime_slot_name(resolved_audio_id))
 
 func detach_surface(audio_id: String = DEFAULT_AUDIO_ID) -> AeroAudioOperation:
-	return _manager(audio_id).detach_surface()
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	return _manager(resolved_audio_id).detach_surface(_runtime_slot_name(resolved_audio_id))
 
 func get_last_error(audio_id: String = DEFAULT_AUDIO_ID) -> Dictionary:
-	var error_info := _manager(audio_id).get_last_error().duplicate(true)
-	error_info["audio_id"] = _resolve_audio_id(audio_id)
+	var resolved_audio_id := _resolve_audio_id(audio_id)
+	var error_info := _manager(resolved_audio_id).get_last_error(_runtime_slot_name(resolved_audio_id)).duplicate(true)
+	error_info["audio_id"] = resolved_audio_id
 	return error_info
 
 func listen_for_state(callback: Callable, emit_immediately: bool = true, audio_id: String = DEFAULT_AUDIO_ID) -> void:
@@ -270,9 +284,15 @@ func _sanitize_audio_id_for_name(audio_id: String) -> String:
 	return _resolve_audio_id(audio_id).replace("/", "_").replace(":", "_").replace(" ", "_")
 
 func _normalize_source_for_audio(source: Dictionary, audio_id: String) -> Dictionary:
+	var resolved_audio_id := _resolve_audio_id(audio_id)
 	var normalized_source := source.duplicate(true)
-	normalized_source["audio_id"] = _resolve_audio_id(audio_id)
-	return _manager(audio_id).normalize_source(normalized_source)
+	normalized_source["audio_id"] = resolved_audio_id
+	normalized_source["slot"] = _runtime_slot_name(resolved_audio_id)
+	return _manager(resolved_audio_id).normalize_source(normalized_source)
+
+func _runtime_slot_name(audio_id: String) -> String:
+	var slot_name := str(_ensure_runtime_manager(audio_id).get_default_source_config().get("slot", "")).strip_edges()
+	return slot_name if not slot_name.is_empty() else "primary"
 
 func _sync_runtime_configuration() -> void:
 	for runtime_manager in _runtime_managers.values():
