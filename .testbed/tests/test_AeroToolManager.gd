@@ -135,6 +135,28 @@ func test_tool_manager_loads_and_plays_even_when_testbed_metadata_mentions_the_a
 	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Default audio should be playing after play")
 	assert_eq(str(_manager.get_state("secondary").get("state", "")), AeroToolManager.STATE_PLAYING, "Secondary audio should be playing after play")
 
+func test_tool_manager_remains_playable_when_loop_is_enabled_after_testbed_style_load() -> void:
+	var surface := _make_surface("LoopToggleSurface")
+	_manager.attach_surface(surface)
+
+	var load_result := _manager.load({
+		"path": SAMPLE_OGG_PATH,
+		"loop": false,
+		"metadata": {"source": "audio_tool_testbed", "slot": AeroToolManager.DEFAULT_AUDIO_ID},
+	})
+	assert_true(load_result.did_succeed(), "Default audio should load with loop disabled before the UI toggle")
+	assert_false(_manager.is_loop_enabled(), "Load should begin with loop disabled for the regression setup")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "Freshly loaded audio should stay ready before play")
+
+	var toggle_result := _manager.set_loop_enabled(true)
+	assert_true(toggle_result.did_succeed(), "Enabling loop after load should succeed without reloading the source")
+	assert_true(_manager.is_loop_enabled(), "Loop should be enabled after the UI-style toggle")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_READY, "Loop toggle should preserve the ready state before play")
+
+	var play_result := _manager.play()
+	assert_true(play_result.did_succeed(), "Audio should still play after enabling loop in the testbed flow")
+	assert_eq(str(_manager.get_state().get("state", "")), AeroToolManager.STATE_PLAYING, "Default audio should enter playing after the loop-enabled play")
+
 func test_tool_manager_supports_packaged_and_external_audio_paths() -> void:
 	var surface := _make_surface("ExternalSurface")
 	_manager.attach_surface(surface)

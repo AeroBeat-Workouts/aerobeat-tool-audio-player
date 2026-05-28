@@ -165,29 +165,14 @@ func set_loop_enabled(enabled: bool, audio_id: String = DEFAULT_AUDIO_ID) -> Aer
 			"detail": {"audio_id": resolved_audio_id},
 			"state": str(state.get("state", STATE_IDLE)),
 		})
-	var previous_state := str(state.get("state", STATE_READY))
-	var previous_position := float(state.get("position", 0.0))
+	var loop_operation := manager.set_loop(enabled, runtime_slot)
+	if not loop_operation.did_succeed():
+		return loop_operation
 	source["loop"] = enabled
-	source["autoplay"] = false
-	var load_operation := manager.load(_normalize_source_for_audio(source, resolved_audio_id), runtime_slot)
-	if not load_operation.did_succeed():
-		return load_operation
-	if previous_position > 0.0:
-		var seek_operation := manager.seek(previous_position, runtime_slot)
-		if not seek_operation.did_succeed():
-			return seek_operation
-	match previous_state:
-		STATE_PLAYING:
-			var play_operation := manager.play(runtime_slot)
-			if not play_operation.did_succeed():
-				return play_operation
-		STATE_PAUSED:
-			var pause_operation := manager.pause(runtime_slot)
-			if not pause_operation.did_succeed():
-				return pause_operation
 	return operation.settle_success({
 		"audio_id": resolved_audio_id,
 		"loop": enabled,
+		"source": source,
 		"state": get_state(resolved_audio_id),
 	})
 
