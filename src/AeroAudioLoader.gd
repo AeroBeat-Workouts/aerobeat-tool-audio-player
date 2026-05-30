@@ -231,6 +231,56 @@ func listen_for_state(callback: Callable, emit_immediately: bool = true, audio_i
 func stop_listening_for_state(callback: Callable) -> void:
 	if callback.is_valid() and state_changed.is_connected(callback):
 		state_changed.disconnect(callback)
+
+func listen_for_audio_state(callback: Callable, emit_immediately: bool = true, audio_id: String = DEFAULT_AUDIO_ID) -> void:
+	if callback.is_valid() and not audio_state_changed.is_connected(callback):
+		audio_state_changed.connect(callback)
+	if emit_immediately and callback.is_valid():
+		var resolved_audio_id := _resolve_audio_id(audio_id)
+		callback.call(resolved_audio_id, str(get_state(resolved_audio_id).get("state", STATE_IDLE)), get_state(resolved_audio_id))
+
+func stop_listening_for_audio_state(callback: Callable) -> void:
+	if callback.is_valid() and audio_state_changed.is_connected(callback):
+		audio_state_changed.disconnect(callback)
+
+func listen_for_audio_position(callback: Callable, emit_immediately: bool = true, audio_id: String = DEFAULT_AUDIO_ID) -> void:
+	if callback.is_valid() and not audio_position_changed.is_connected(callback):
+		audio_position_changed.connect(callback)
+	if emit_immediately and callback.is_valid():
+		var resolved_audio_id := _resolve_audio_id(audio_id)
+		callback.call(resolved_audio_id, get_position(resolved_audio_id), _normalized_position(resolved_audio_id))
+
+func stop_listening_for_audio_position(callback: Callable) -> void:
+	if callback.is_valid() and audio_position_changed.is_connected(callback):
+		audio_position_changed.disconnect(callback)
+
+func listen_for_audio_media(callback: Callable, emit_immediately: bool = true, audio_id: String = DEFAULT_AUDIO_ID) -> void:
+	if callback.is_valid() and not audio_media_loaded.is_connected(callback):
+		audio_media_loaded.connect(callback)
+	if emit_immediately and callback.is_valid():
+		callback.call(_resolve_audio_id(audio_id), get_media_info(audio_id))
+
+func stop_listening_for_audio_media(callback: Callable) -> void:
+	if callback.is_valid() and audio_media_loaded.is_connected(callback):
+		audio_media_loaded.disconnect(callback)
+
+func listen_for_audio_playback_finished(callback: Callable) -> void:
+	if callback.is_valid() and not audio_playback_finished.is_connected(callback):
+		audio_playback_finished.connect(callback)
+
+func stop_listening_for_audio_playback_finished(callback: Callable) -> void:
+	if callback.is_valid() and audio_playback_finished.is_connected(callback):
+		audio_playback_finished.disconnect(callback)
+
+func listen_for_audio_errors(callback: Callable, emit_immediately: bool = false, audio_id: String = DEFAULT_AUDIO_ID) -> void:
+	if callback.is_valid() and not audio_error_raised.is_connected(callback):
+		audio_error_raised.connect(callback)
+	if emit_immediately and callback.is_valid():
+		callback.call(_resolve_audio_id(audio_id), get_last_error(audio_id))
+
+func stop_listening_for_audio_errors(callback: Callable) -> void:
+	if callback.is_valid() and audio_error_raised.is_connected(callback):
+		audio_error_raised.disconnect(callback)
 #endregion
 
 #region PRIVATE HELPERS
@@ -290,6 +340,12 @@ func _with_audio_id(detail: Dictionary, audio_id: String) -> Dictionary:
 	if not payload.has("loop"):
 		payload["loop"] = bool(payload.get("source", {}).get("loop", false))
 	return payload
+
+func _normalized_position(audio_id: String) -> float:
+	var duration := get_duration(audio_id)
+	if duration <= 0.0:
+		return 0.0
+	return clampf(get_position(audio_id) / duration, 0.0, 1.0)
 
 func _on_runtime_initialized(_audio_id: String) -> void:
 	pass

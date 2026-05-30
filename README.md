@@ -18,9 +18,7 @@ It should be read against the locked product direction from `aerobeat-docs`:
   - `aerobeat-tool-core` — required shared tool/workflow contract
   - additional adjacent lane/core repos only when the specific tool actually consumes them (commonly `aerobeat-content-core` or `aerobeat-asset-core`)
 
-## GodotEnv development flow
-
-This repo uses the AeroBeat GodotEnv package convention.
+## Development flow
 
 - Canonical dev/test manifest: `.testbed/addons.jsonc`
 - Installed dev/test addons: `.testbed/addons/`
@@ -28,42 +26,28 @@ This repo uses the AeroBeat GodotEnv package convention.
 - Hidden workbench project: `.testbed/project.godot`
 - Repo-local unit tests: `.testbed/tests/`
 
-The repo root remains the package/published boundary for downstream consumers. Day-to-day development, debugging, and validation happen from the hidden `.testbed/` workbench using the pinned OpenClaw toolchain: Godot `4.6.2 stable standard`.
-
-### Restore dev/test dependencies
-
-From the repo root:
+Restore dev/test dependencies from the repo root:
 
 ```bash
 cd .testbed
 godotenv addons install
 ```
 
-That restores this repo's current dev/test manifest into `.testbed/addons/`. Canonically, Tool templates should keep the baseline manifest narrow: `aerobeat-tool-core` plus test-only tooling.
-
-### Open the workbench
-
-From the repo root:
+Open the workbench:
 
 ```bash
 godot --editor --path .testbed
 ```
 
-Use this `.testbed/` project as the canonical direct-development and bugfinding surface for tool-template work.
+## Validation
 
-The hidden proving surface in this repo now exercises the audio abstraction through two independent tool-managed slots. Each slot can load packaged or external `.ogg`/`.wav` assets, toggle loop mode, and drive playback/seek/volume controls without bleeding state into the other slot.
-
-### Import smoke check
-
-From the repo root:
+Run an import smoke check:
 
 ```bash
 godot --headless --path .testbed --import
 ```
 
-### Run unit tests
-
-From the repo root:
+Run unit tests:
 
 ```bash
 godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
@@ -72,12 +56,9 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
   -gexit
 ```
 
-### Validation notes
+## Architecture notes
 
-- `.testbed/addons.jsonc` is the committed dev/test dependency contract.
-- The canonical template manifest for this repo is `aerobeat-tool-core` + `gut`.
-- `aerobeat-tool-core` is currently pinned to `main` intentionally because the repo does not yet have release tags; switch to a tag once tagged releases exist.
-- If a concrete tool needs adjacent lane repos, add them intentionally rather than restoring a universal `aerobeat-core` baseline.
-- Repo-local unit tests live under `.testbed/tests/` and validate repo metadata plus the real tool-facing audio abstraction contract.
-- The current testbed/tests cover loop enable/disable, independent multi-slot playback control, and both packaged plus external local audio paths through `AeroAudioLoader` rather than the backend directly.
+- The singleton mirrors the vendor backend surface for `load`, `unload`, `play`, `pause`, `resume`, `stop`, `seek`, `set_volume_db`, and state/error listeners.
+- The hidden proving surface in this repo now exercises the audio abstraction through two independent tool-managed slots. Each slot can load packaged or external `.ogg`/`.wav` assets, toggle loop mode, and drive playback/seek/volume controls without bleeding state into the other slot.
+- Repo-local tests cover the singleton callbacks, slot-isolated playback behavior, and packaged/external audio source handling.
 - The current package shape is consumed from the repo root (`subfolder: "/"`) for downstream installs.

@@ -230,3 +230,38 @@ func test_failure_callbacks_and_state_listener_helpers_surface_honest_errors() -
 	assert_true(int(callback_state.get("listener_calls", 0)) >= 1, "listen_for_state should optionally emit the current state immediately")
 	_manager.stop_listening_for_state(listener)
 	assert_false(_manager.state_changed.is_connected(listener), "stop_listening_for_state should disconnect the callback")
+
+func test_tool_listener_helpers_surface_tool_facing_callbacks_with_audio_ids() -> void:
+	var callback_state := {
+		"state": [],
+		"position": [],
+		"media": [],
+		"finished": 0,
+		"errors": [],
+	}
+	var state_listener := func(audio_id: String, state: String, detail: Dictionary) -> void:
+		callback_state["state"].append([audio_id, state, detail.get("audio_id", "")])
+	var position_listener := func(audio_id: String, seconds: float, normalized: float) -> void:
+		callback_state["position"].append([audio_id, seconds, normalized])
+	var media_listener := func(audio_id: String, info: Dictionary) -> void:
+		callback_state["media"].append([audio_id, str(info.get("audio_id", "")), str(info.get("path", ""))])
+	var finished_listener := func(audio_id: String) -> void:
+		callback_state["finished"] = int(callback_state.get("finished", 0)) + 1
+	var error_listener := func(audio_id: String, error_info: Dictionary) -> void:
+		callback_state["errors"].append([audio_id, str(error_info.get("audio_id", "")), str(error_info.get("code", ""))])
+	_manager.listen_for_audio_state(state_listener)
+	_manager.listen_for_audio_position(position_listener)
+	_manager.listen_for_audio_media(media_listener)
+	_manager.listen_for_audio_playback_finished(finished_listener)
+	_manager.listen_for_audio_errors(error_listener)
+	var load_result := _manager.load({"path": SAMPLE_OGG_PATH})
+	assert_true(load_result.did_succeed(), "Load should still succeed through the vendor-backed tool abstraction")
+	assert_true(callback_state["state"].size() >= 1, "Tool-facing state listener should emit immediately")
+	assert_true(callback_state["position"].size() >= 1, "Tool-facing position listener should emit immediately")
+	assert_true(callback_state["media"].size() >= 1, "Tool-facing media listener should emit immediately")
+	assert_eq(int(callback_state.get("finished", 0)), 0, "Finished listener should remain idle before playback completes")
+	_manager.stop_listening_for_audio_state(state_listener)
+	_manager.stop_listening_for_audio_position(position_listener)
+	_manager.stop_listening_for_audio_media(media_listener)
+	_manager.stop_listening_for_audio_playback_finished(finished_listener)
+	_manager.stop_listening_for_audio_errors(error_listener)

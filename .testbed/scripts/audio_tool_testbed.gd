@@ -69,11 +69,11 @@ func _ready() -> void:
 
 	_manager = AeroAudioLoader.new()
 	add_child(_manager)
-	_manager.audio_state_changed.connect(_on_audio_state_changed)
-	_manager.audio_media_loaded.connect(_on_audio_media_loaded)
-	_manager.audio_error_raised.connect(_on_audio_error_raised)
-	_manager.audio_position_changed.connect(_on_audio_position_changed)
-	_manager.audio_playback_finished.connect(_on_audio_playback_finished)
+	_manager.listen_for_audio_state(_on_audio_state_changed, false)
+	_manager.listen_for_audio_media(_on_audio_media_loaded, false)
+	_manager.listen_for_audio_errors(_on_audio_error_raised, false)
+	_manager.listen_for_audio_position(_on_audio_position_changed, false)
+	_manager.listen_for_audio_playback_finished(_on_audio_playback_finished)
 
 	picker.filters = PackedStringArray(["*.ogg ; Ogg Vorbis", "*.wav ; Waveform Audio"])
 	for slot_id in SLOT_IDS:
